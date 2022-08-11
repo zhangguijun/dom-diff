@@ -1,85 +1,81 @@
 import {
     ATTR,
     TEXT,
-    REMOVE,
-    REPLACE
-} from './patchType';
-
-// 声明补丁包
-
-let patches = {};
-let vnIndex = 0;
-function domDiff(oldVDom, newVDom) {
+    REPLACE,
+    REMOVE
+  } from './patchType';
+  
+  let patches = {},
+      vnIndex = 0;
+  
+  function domDiff (oldVDom, newVDom) {
     let index = 0;
-
     vNodeWalk(oldVDom, newVDom, index);
-    console.log(patches)
     return patches;
-}
-
-function vNodeWalk(oldNode, newNode, index) {
-    let vNPatch = [];
-
+  }
+  
+  function vNodeWalk (oldNode, newNode, index) {
+    let vnPatch = [];
+  
     if (!newNode) {
-        vNPatch.push({
-            type: REMOVE,
-            index
-        })
+      vnPatch.push({
+        type: REMOVE,
+        index
+      })
     } else if (typeof oldNode === 'string' && typeof newNode === 'string') {
-        if (oldNode !== newNode) {
-            vNPatch.push({
-                type: TEXT,
-                text: newNode
-            })
-        }
+      if (oldNode !== newNode) {
+        vnPatch.push({
+          type: TEXT,
+          text: newNode
+        })
+      }
     } else if (oldNode.type === newNode.type) {
-        const attrPatch = attrWalk(oldNode.props, newNode.props);
-        console.log(attrPatch)
-
-        if(Object.keys(attrPatch).length > 0) {
-            vNPatch.push({
-                type: ATTR,
-                attrs: attrPatch
-            })
-        }
-
-        childWalk(oldNode.children, newNode.children);
+      const attrPatch = attrsWalk(oldNode.props, newNode.props);
+  
+      if (Object.keys(attrPatch).length > 0) {
+        vnPatch.push({
+          type: ATTR,
+          attrs: attrPatch
+        });
+      }
+  
+      childrenWalk(oldNode.children, newNode.children);
+    } else {
+      vnPatch.push({
+        type: REPLACE,
+        newNode
+      })
     }
-
-    if(vNPatch.length > 0) {
-        patches[index] =  vNPatch;
+  
+    if (vnPatch.length > 0) {
+      patches[index] = vnPatch;
     }
-
-}
-
-function attrWalk(oldAttrs, newAttrs) {
+  }
+  
+  function attrsWalk (oldAttrs, newAttrs) {
     let attrPatch = {};
-
-
-    for (const key in oldAttrs) {
-        // 修改属性
-        if (oldAttrs[key] !== newAttrs[key]) {
-            attrPatch[key] = newAttrs[key]
-        }
+  
+    for (let key in oldAttrs) {
+      // 修改属性
+      if (oldAttrs[key] !== newAttrs[key]) {
+        attrPatch[key] = newAttrs[key];
+      }
     }
-    for (const key in newAttrs) {
-        // 修改属性
-        if (oldAttrs.hasOwnProperty(key)) {
-            attrPatch[key] = newAttrs[key]
-        }
+  
+    for (let key in newAttrs) {
+      // 新增
+      if (!oldAttrs.hasOwnProperty(key)) {
+        attrPatch[key] = newAttrs[key];
+      }
     }
-
-
+  
     return attrPatch;
-
-
-}
-
-
-function childWalk(oldChildren, newChildren) {
+  }
+  
+  function childrenWalk (oldChildren, newChildren) {
     oldChildren.map((c, idx) => {
-        vNodeWalk(c, newChildren[idx], ++ vnIndex);
-    })
-}
-
-export default domDiff;
+      vNodeWalk(c, newChildren[idx], ++ vnIndex);
+    });
+  }
+  
+  export default domDiff;

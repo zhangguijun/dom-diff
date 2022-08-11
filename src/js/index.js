@@ -16,13 +16,13 @@ const vDom = createElement('ul', {
         ]),
         createElement('li', {
             class: 'item',
-            'data-index': 0,
+            'data-index': 1,
         }, [
             createElement('p', { class: 'text' }, [createElement('span', { class: 'title' }, ['第二个列表项'])])
         ]),
         createElement('li', {
             class: 'item',
-            'data-index': 0,
+            'data-index': 2,
         }, ['第三个列表项']),
     ]
 )
@@ -38,23 +38,24 @@ const vDom2 = createElement('ul', {
         ]),
         createElement('li', {
             class: 'item',
-            'data-index': 0,
+            'data-index': 1,
         }, [
             createElement('p', { class: 'text' }, [])
         ]),
         createElement('div', {
             class: 'item',
-            'data-index': 0,
+            'data-index': 2,
         }, ['第三个列表项']),
     ]
 )
 
 const rDom = render(vDom);
 
-console.log(rDom, '真实dom')
+// console.log(rDom, '真实dom')
 
-domDiff(vDom, vDom2)
+const patches = domDiff(vDom, vDom2);
+console.log('补丁包', patches)
 
 renderDOM(rDom, document.getElementById('app'))
 
-console.log(vDom)
+// console.log(vDom)
